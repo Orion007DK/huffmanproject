@@ -15,6 +15,7 @@ import MContext from './MContext';
 //var x='xx';
 
 var wordMap = new Map();
+var arr = [];
 class TreeGenerator extends Component {
 
  constructor(props) {
@@ -23,7 +24,8 @@ class TreeGenerator extends Component {
       input: "2",
       dot: 'digraph  {a -> b}',
       words: '',
-      wordsSplit: ''
+      wordsSplit: '',
+      array: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -76,7 +78,7 @@ class TreeGenerator extends Component {
   }  
   }
 
-  async handleWords(event) {
+  async handleWords(event, context){
     this.setState({words: event.target.value});
     await this.setState({wordsSplit: event.target.value.split("")});
     wordMap=new Map();
@@ -88,13 +90,20 @@ class TreeGenerator extends Component {
       }
   })
 
-  wordMap = await new Map([...wordMap.entries()].sort((a, b) => b[1] - a[1]));
+  wordMap = new Map([...wordMap.entries()].sort((a, b) => b[1] - a[1]));
 
-    console.log("witam");
-    console.log(this.state.words);
-    console.log(this.state.wordsSplit);
-    await console.log(wordMap);
-    await this.createTable();
+ arr =  Array.from(wordMap);
+
+    arr.forEach((x) => {
+      x[2]=x[0].charCodeAt(0);
+      x[3]='1100';
+    })
+
+  this.setState({array: arr});
+
+  context.setArray(this.state.array);
+ // context.setMessage(wordMap);
+    //await this.createTable();
     
   }
 
@@ -143,7 +152,7 @@ class TreeGenerator extends Component {
           
           <MContext.Consumer>
      {(context) => (
-       <input name="words" type="text" value={this.state.words} onChange={event => {this.handleWords(event); context.setMessage(wordMap)}}></input>
+       <input name="words" type="text" value={this.state.words} onChange={event => {this.handleWords(event, context)}}></input>
        )}</MContext.Consumer>
        
           <br />
@@ -151,7 +160,7 @@ class TreeGenerator extends Component {
         </form>
         <MContext.Consumer>
      {(context) => (
-       <button onClick={()=> context.setMessage(wordMap)}>Odśwież</button>
+       <button onClick={()=> context.setArray(this.state.array)}>Odśwież</button>
        )}</MContext.Consumer>
         <button onClick={() => this.setGraph()}>
           {'Click me'}
